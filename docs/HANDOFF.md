@@ -57,3 +57,14 @@ All base measurements are defined near the top of `GameEngine.ts`. The canvas de
 ## Manual QA checklist
 
 Check Space, mouse, and touch input; pausing/resuming; collision with pipe/ceiling/ground; score increment; best-score persistence after reload; mute persistence; narrow and wide layouts; and a production build. The canvas uses device-pixel-ratio backing pixels for crisp high-DPI rendering.
+
+## Mobile constraints
+
+Four things are load-bearing and easy to undo by accident:
+
+- `index.html` **must** keep its `<meta name="viewport">`. Without it mobile browsers lay out at ~980px and scale the whole game down.
+- `.auth input` must stay at `font-size:16px`. Anything smaller makes iOS Safari zoom the page in when the field is focused, and it does not zoom back out.
+- `.overlay` centres with `margin:auto` on its first and last child rather than `place-content:center`, and sets `overflow-y:auto`. Centring alone clips the top of tall content on short screens with no way to scroll to it — that made the guest button unreachable in landscape.
+- `.hud` needs its `z-index`. The overlays cover the whole frame, so without it mute and pause cannot be tapped from the home or game-over screens.
+
+Layout is verified at 280–768px wide plus landscape phones. The game is a 7:12 portrait canvas letterboxed by `GameEngine.resize`, so landscape necessarily shows a smaller playfield; the `max-height:520px` block claws back what it can by shrinking chrome and hiding the footer.
