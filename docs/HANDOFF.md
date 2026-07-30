@@ -26,7 +26,7 @@ Skybound Flap is an original, responsive Flappy-style browser game. React owns t
 
 The `skybound-flap-stats-v1` localStorage key stores `{ best, games, total, muted }`. Keep migrations backward-compatible if this shape changes. Data is device-local; clearing site storage clears it.
 
-For authenticated players, the same fields are also stored in Supabase `public.player_stats`, keyed by `auth.users.id`. The schema and row-level-security policies live in `supabase/migrations/20260730_player_stats.sql`: players can only read/write their own row. The browser only receives the Supabase publishable key; never commit `.env` or a Supabase access/service-role token. Username-only login is implemented with a private synthetic email (`<username>@players.skyboundflap.local`) passed to Supabase Auth. Disable Auth email confirmation in the Supabase dashboard, otherwise new accounts cannot complete this username-only flow.
+For authenticated players, the same fields are also stored in Supabase `public.player_stats`, keyed by `auth.users.id`. The schema and row-level-security policies live in `supabase/migrations/20260730_player_stats.sql`: players can only read/write their own row. The browser only receives the Supabase publishable key; never commit `.env` or a Supabase access/service-role token. Username-only login is implemented with a private valid-format email (`<username>@players.skyboundflap.com`) passed to Supabase Auth. Disable Auth email confirmation in the Supabase dashboard, otherwise new accounts cannot complete this username-only flow.
 
 ## Gameplay tuning
 

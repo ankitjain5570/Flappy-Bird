@@ -17,7 +17,7 @@ Read [docs/HANDOFF.md](docs/HANDOFF.md) first. It explains the game loop, archit
 
 ## Optional online player accounts
 
-Copy `.env.example` to `.env` and add the Supabase URL and publishable key. Apply `supabase/migrations/20260730_player_stats.sql` to the linked Supabase project. The game supports guest play by default; signed-in players sync their scores. Account names accept 3–24 letters, numbers, or underscores. In Supabase Auth, turn off **Confirm email** because the app uses a private synthetic email internally to support username-only sign-in.
+Copy `.env.example` to `.env` and add the Supabase URL and publishable key. Apply `supabase/migrations/20260730_player_stats.sql` to the linked Supabase project. The game supports guest play by default; signed-in players sync their scores. Account names accept 3–24 letters, numbers, or underscores. In Supabase Auth, turn off **Confirm email** because the app uses a private valid-format email internally to support username-only sign-in.
 
 ## Controls
 

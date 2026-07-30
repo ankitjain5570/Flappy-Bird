@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
-const usernameEmail = (username: string) => `${username.trim().toLowerCase()}@players.skyboundflap.local`;
+// Supabase Auth requires RFC-valid email syntax even though the UI is username-only.
+const usernameEmail = (username: string) => `${username.trim().toLowerCase()}@players.skyboundflap.com`;
 export const isValidUsername = (value: string) => /^[a-zA-Z0-9_]{3,24}$/.test(value);
 
 export function useAuth() {
