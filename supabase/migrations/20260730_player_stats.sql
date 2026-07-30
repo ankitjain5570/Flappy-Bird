@@ -9,6 +9,8 @@ create table if not exists public.player_stats (
 
 alter table public.player_stats enable row level security;
 
+grant select, insert, update on table public.player_stats to authenticated;
+
 create policy "Players can read their own stats" on public.player_stats
   for select to authenticated using ((select auth.uid()) = user_id);
 
