@@ -2,13 +2,14 @@
 
 ## Purpose
 
-Skybound Flap is an original, responsive Flappy-style browser game. React owns the surrounding interface; the HTML canvas owns simulation and rendering. There is no backend, no external assets, and no authentication.
+Skybound Flap is an original, responsive Flappy-style browser game. React owns the surrounding interface; the HTML canvas owns simulation and rendering. There are no external assets. Supabase provides optional username-only player accounts that sync scores across devices.
 
 ## Running and shipping
 
 - `npm install` installs dependencies.
 - `npm run dev` starts the Vite development server.
-- `npm run build` type-checks and emits a deployable static `dist/` bundle. Vercel can use the standard Vite preset (build command: `npm run build`, output: `dist`).
+- `npm run build` type-checks and emits a deployable static `dist/` bundle. Netlify uses `netlify.toml` (build command `npm run build`, publish `dist`).
+- `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` must be set **in the host's build environment**, not just in local `.env`. Vite inlines them at build time, so a deploy missing them ships a build where accounts silently cannot work; `src/lib/supabase.ts` logs a console error in that case.
 
 ## Architecture
 
@@ -26,7 +27,20 @@ Skybound Flap is an original, responsive Flappy-style browser game. React owns t
 
 The `skybound-flap-stats-v1` localStorage key stores `{ best, games, total, muted }`. Keep migrations backward-compatible if this shape changes. Data is device-local; clearing site storage clears it.
 
-For authenticated players, the same fields are also stored in Supabase `public.player_stats`, keyed by `auth.users.id`. The schema and row-level-security policies live in `supabase/migrations/20260730_player_stats.sql`: players can only read/write their own row. The browser only receives the Supabase publishable key; never commit `.env` or a Supabase access/service-role token. Username-only login is implemented with a private valid-format email (`<username>@players.skyboundflap.com`) passed to Supabase Auth. Disable Auth email confirmation in the Supabase dashboard, otherwise new accounts cannot complete this username-only flow.
+For authenticated players, the same fields are also stored in Supabase `public.player_stats`, keyed by `auth.users.id`. The schema and row-level-security policies live in `supabase/migrations/20260730_player_stats.sql`: players can only read/write their own row. The browser only receives the Supabase publishable key; never commit `.env` or a Supabase access/service-role token.
+
+Signing in merges rather than replaces: `useGameStats` keeps the higher of the local and stored values for `best`, `games`, and `total`, so guest progress on a device is never discarded by logging in.
+
+## Accounts
+
+Username-only login is implemented with a private valid-format email (`<username>@players.skyboundflap.com`) passed to Supabase Auth. That domain does not receive mail, so **Auth email confirmation must stay disabled** (`mailer_autoconfirm = true`, "Confirm email" off under Authentication → Sign In / Providers → Email). With confirmation on, every sign-up either stalls unconfirmed or fails outright with `over_email_send_rate_limit`, because Supabase tries to send a confirmation mail to an address that cannot exist.
+
+Two entry paths, both supported:
+
+- **Gate.** A first-time visitor sees the account panel before playing, with sign in, create account, and "Skip for now and play as guest".
+- **Guest.** Choosing guest sets `skybound-flap-guest-v1` in localStorage so the gate does not reappear; scores stay on the device. The home screen keeps a "Sign in to sync scores" link, and signing out returns the player to the gate.
+
+`useAuth` translates Supabase's email-shaped error codes into username wording; add new cases to `friendly()` rather than surfacing raw messages.
 
 ## Gameplay tuning
 
