@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Skybound Flap">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fd9ff"/>
+      <stop offset="1" stop-color="#5cb8f0"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#sky)"/>
+  <!-- Bird drawn to the same palette as GameEngine.birdDraw, simplified so it
+       still reads at 16px: body, wing, beak, eye. No outline, no shadow. -->
+  <ellipse cx="30" cy="49" rx="19" ry="4" fill="#3f7ea3" opacity=".22"/>
+  <circle cx="30" cy="32" r="17.5" fill="#ffc94b"/>
+  <ellipse cx="24.5" cy="37" rx="10" ry="5.5" transform="rotate(-18 24.5 37)" fill="#f39a42"/>
+  <path d="M45 28.5 L59 33 L45 37.5 Z" fill="#ff7b48"/>
+  <circle cx="37" cy="26" r="6.2" fill="#ffffff"/>
+  <circle cx="39.2" cy="26" r="2.9" fill="#24334d"/>
+</svg>
