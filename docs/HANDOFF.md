@@ -58,6 +58,25 @@ All base measurements are defined near the top of `GameEngine.ts`. The canvas de
 
 Check Space, mouse, and touch input; pausing/resuming; collision with pipe/ceiling/ground; score increment; best-score persistence after reload; mute persistence; narrow and wide layouts; and a production build. The canvas uses device-pixel-ratio backing pixels for crisp high-DPI rendering.
 
+## Progression system
+
+The base game — controls, flight physics, collision, scoring, pipe art — is unchanged. Everything on top of it lives behind one interface and one manager.
+
+`src/game/mechanics/types.ts` defines `Mechanic` (`name`, `unlockScore`, `duration`, `difficulty`, `activate`, `update`, `deactivate`, `render`) and the `MechanicContext` a mechanic sees. Mechanics never import the engine. They read the world from the context, write per-frame modifiers onto it (`speedMul`, `gravityMul`, `windY`, `suppressPipes`), and request outcomes through its services (`kill`, `coin`, `banner`, `burst`, `sound`). Hazard collision lives inside each mechanic, so the engine's own collision rule is untouched.
+
+`src/game/Director.ts` is the difficulty manager. It owns the registry, decides what runs from score alone, and enforces the fairness rules: at most three ambient mechanics at once, no pair from `INCOMPATIBLE` together, one new mechanic introduced per band with a banner before it can affect play. Bosses and cave sections are *events* — they take the screen exclusively and suppress pipes. Level 11 re-rolls procedurally, alternating harsh phases with shorter breathers.
+
+Modifiers are rebuilt from defaults every frame and mechanics only multiply or add, so a mechanic switching off can never leave a residue behind. With nothing active the context resolves to `speedMul 1`, `gravityMul 1`, `pipeScore 1` — bit-for-bit the original game.
+
+To add a mechanic: write a module returning a `Mechanic`, add it to `Director.lib`, and give it a band in `learned()`. Nothing else needs to change.
+
+Two deliberate deviations from the original engine, both required by the brief's difficulty rules:
+
+- The base speed ramp is capped at `level 12` in `GameEngine.update`. Uncapped it reached ~645px/s by score 500, which is the "extreme speed" the rules forbid; difficulty past that point comes from mechanics instead.
+- `this.score++` became `this.score += this.director.pipeScore()` so the Double Score powerup can exist. It returns 1 unless that powerup is running.
+
+`debugJump` / `debugInfo` on the engine are dev-only hooks used by the verification harness and are stripped from production builds.
+
 ## Mobile constraints
 
 Four things are load-bearing and easy to undo by accident:
