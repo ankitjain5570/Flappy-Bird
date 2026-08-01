@@ -4,3 +4,10 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Netlify has no default content type for .webmanifest and falls back to
+# octet-stream, which browsers may refuse to parse as a manifest.
+[[headers]]
+  for = "/site.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
